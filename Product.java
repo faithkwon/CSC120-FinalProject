@@ -1,13 +1,13 @@
-import java.util.Random;
 
 public class Product {
     
     /* Attributes */
-    private int price;
+    private double price;
+    private String priceName;
     private String name;
-    private int productionCost;
+    private double productionCost;
     private ProductType type;
-    private int demand;
+    private double demand;
 
     /**
      * Product constructor
@@ -16,28 +16,33 @@ public class Product {
      * @param type type of product
      */
     public Product(int pricePoint, String name, ProductType type) {
-        Random random = new Random();
-        
-        if (pricePoint == 3) {
-            this.price = random.nextInt(15, 21);
-            this.productionCost = 12;
-        } else if (pricePoint == 2) {
-            this.price = random.nextInt(10, 15);
-            this.productionCost = 7;
-        } else if (pricePoint == 1) {
-            this.price = random.nextInt(5, 10);
-            this.productionCost = 2;
+        switch (pricePoint) {
+            case 3 -> {
+                this.price = 15.;
+                this.productionCost = 12.;
+                this.priceName = "expensive";
+            }
+            case 2 -> {
+                this.price = 10.;
+                this.productionCost = 7.;
+                this.priceName = "mid-priced";
+            }
+            case 1 -> {
+                this.price = 5.;
+                this.productionCost = 2.;
+                this.priceName = "cheap";
+            }
         }
 
         this.name = name;
         this.type = type;
 
-        this.demand = 1; // calculate demand
+        this.demand = 1.; 
     }
 
     /* Getter methods for attributes */
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -45,7 +50,7 @@ public class Product {
         return name;
     }
 
-    public int getProductionCost() {
+    public double getProductionCost() {
         return productionCost;
     }
 
@@ -53,8 +58,20 @@ public class Product {
         return type;
     }
 
-    public int getDemand() {
+    public double getDemand() {
         return demand;
+    }
+
+    public String toString() {
+        return name + ", a " + priceName + " " + type + " product priced at $" + price + " that costs $" + productionCost + " to produce";
+    }
+
+    /**
+     * Setter method for ProductType
+     * @param p type
+     */
+    public void setType(ProductType p) {
+        this.type = p;
     }
 
     /**
@@ -62,38 +79,25 @@ public class Product {
      * @param increase if you want to increase or decrease the price
      * @param percent the % you want to inc/dec the price by
      */
-    public void changePrice(boolean increase, int percent) {
+    public void changePrice(boolean increase, double percent) {
         if (increase) {
-            this.price = this.price + (this.price * (percent / 100));
+            this.price += price * (percent / 100.);
         } else {
-            this.price = this.price - (this.price * (percent / 100));
-        }
-    }
-
-    /**
-     * Setter method for production costs -- decreases/increases the price by the same amount
-     * @param increase if you want to increase or decrease the production costs
-     * @param percent the % you want to inc/dec by
-     */
-    public void changeProductionCost(boolean increase, int percent) {
-        if (increase) {
-            this.productionCost = this.productionCost + (this.productionCost * (percent / 100));
-            this.price = this.price + (this.price * (percent / 100));
-        } else {
-            this.productionCost = this.productionCost - (this.productionCost * (percent / 100));
-            this.price = this.price - (this.price * (percent / 100));
+            this.price -= price * (percent / 100.);
         }
     }
     
     /**
-     * Calculating demand (work in progress..... still workshopping the algorithm but the base idea is that demand goes up when prices get lower)
-     * @param type the product type that is currently "in demand" 
+     * Calculating demand
+     * @param factor the amount at which demand is increasing/decreasing by
      */
-    public void calculateDemand(ProductType type) {
-        if (this.type == type) {
-            this.demand = (int)(((productionCost * 2) / price) * 1.5);
-        } else {
-            this.demand = (productionCost * 2) / price;
-        }
+    public void increaseDemand(double factor) {
+        demand += factor;
+        demand = Math.min(demand, 5.0); // cap demand to prevent runaway growth
+    }
+    
+    public void decreaseDemand(double factor) {
+        demand -= factor;
+        demand = Math.max(demand, 0.1); // prevent zero or negative demand
     }
 }
